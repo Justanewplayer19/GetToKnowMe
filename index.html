@@ -1,0 +1,1033 @@
+<!--      _ _   _                       _ _                     _       
+__      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
+\ \ /\ / / | __| '_ \ / _ \ '__/ _ \/ _` | '_ \ / _ \/ _` | '__| __|_  /
+ \ V  V /| | |_| | | |  __/ | |  __/ (_| | | | |  __/ (_| | |  | |_ / / 
+  \_/\_/ |_|\__|_| |_|\___|_|  \___|\__,_|_| |_|\___|\__,_|_|   \__/___| -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>witheredheartz</title>
+	<link rel="icon" type="image/png"
+		href="https://example.com/icon"> <!-- this can be any icon you want. -->
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<style>
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+			height: 100%;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			scroll-behavior: smooth;
+		}
+
+		body {
+			background: #000;
+			color: #e0e0e0;
+			overflow-x: hidden;
+		}
+
+		audio {
+			display: none !important;
+			visibility: hidden !important;
+		}
+
+		.background-container {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: -2;
+			background-image: url('https://i.pinimg.com/originals/06/bb/79/06bb79b09356eab20d22eae0e65ccded.gif');
+			background-size: cover;
+			background-position: center;
+			display: block;
+		}
+
+		.background-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
+			z-index: -1;
+		}
+
+		#splash-screen {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: #000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			cursor: pointer;
+			transition: opacity 0.8s ease;
+		}
+
+		#splash-screen.hide {
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.splash-text {
+			font-size: 1.1rem;
+			font-weight: 400;
+			letter-spacing: 1px;
+			background: linear-gradient(90deg, #fff, #ffb3d9, #ff69b4, #ffb3d9, #fff);
+			background-size: 200% 100%;
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			animation: gradientMove 3s linear infinite;
+		}
+
+		@keyframes gradientMove {
+			0% {
+				background-position: 0% 50%;
+			}
+
+			100% {
+				background-position: 200% 50%;
+			}
+		}
+
+		.main-content {
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 40px 20px;
+			opacity: 0;
+			transition: opacity 0.8s ease;
+			transition-delay: 0.3s;
+		}
+
+		.main-content.show {
+			opacity: 1;
+		}
+
+		.username {
+			font-size: 1.8rem;
+			font-weight: 600;
+			color: #fff;
+			margin-bottom: 10px;
+		}
+
+		.bio-text {
+			font-size: 0.95rem;
+			color: #888;
+			margin-bottom: 40px;
+			line-height: 1.4;
+			text-align: center;
+		}
+
+		.scroll-button {
+			padding: 14px 35px;
+			background: rgba(255, 255, 255, 0.08);
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			border-radius: 8px;
+			color: #fff;
+			font-size: 0.95rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.scroll-button:hover {
+			background: rgba(255, 255, 255, 0.12);
+			border-color: rgba(255, 255, 255, 0.3);
+			transform: translateY(-2px);
+		}
+
+		.discord-card {
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 12px;
+			padding: 0;
+			margin-top: 30px;
+			max-width: 400px;
+			width: 100%;
+			overflow: hidden;
+			position: relative;
+		}
+
+		.discord-banner {
+			width: 100%;
+			height: 100px;
+			background-size: cover;
+			background-position: center;
+			background-color: rgba(88, 101, 242, 0.3);
+		}
+
+		.discord-card-content {
+			padding: 0 20px 20px 20px;
+		}
+
+		.discord-card-header {
+			display: flex;
+			align-items: flex-start;
+			gap: 12px;
+			margin-top: -35px;
+			margin-bottom: 16px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.discord-avatar-wrapper {
+			position: relative;
+			width: 70px;
+			height: 70px;
+			flex-shrink: 0;
+		}
+
+		.discord-avatar {
+			width: 70px;
+			height: 70px;
+			border-radius: 50%;
+			border: 4px solid rgba(0, 0, 0, 0.9);
+			position: relative;
+			z-index: 1;
+		}
+
+		.avatar-decoration {
+			position: absolute;
+			top: 1px;
+			left: 1px;
+			width: 70px;
+			height: 70px;
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
+			z-index: 2;
+			pointer-events: none;
+		}
+
+		.status-dot {
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			position: absolute;
+			bottom: -5px;
+			right: -5px;
+			border: 4px solid rgba(0, 0, 0, 0.9);
+			z-index: 3;
+		}
+
+		.discord-info {
+			flex: 1;
+			margin-top: 40px;
+		}
+
+		.discord-username {
+			font-size: 1.15rem;
+			font-weight: 600;
+			color: #fff;
+			margin-bottom: 2px;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.clan-tag {
+			background: rgba(255, 255, 255, 0.1);
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			color: #ccc;
+			display: flex;
+			align-items: center;
+			gap: 3px;
+		}
+
+		.clan-icon {
+			width: 12px;
+			height: 12px;
+			object-fit: contain;
+		}
+
+		.discord-status-text {
+			font-size: 0.85rem;
+			color: #888;
+		}
+
+		.discord-meta {
+			display: flex;
+			gap: 6px;
+			margin-top: 10px;
+			font-size: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		.meta-badge {
+			background: rgba(255, 255, 255, 0.08);
+			padding: 4px 8px;
+			border-radius: 4px;
+			color: #ccc;
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+
+		.meta-icon {
+			width: 14px;
+			height: 14px;
+			object-fit: contain;
+		}
+
+		.badges-container {
+			display: flex;
+			gap: 6px;
+			flex-wrap: wrap;
+			margin-top: 12px;
+			padding-top: 12px;
+			border-top: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.badge-item {
+			background: rgba(255, 255, 255, 0.08);
+			padding: 5px 10px;
+			border-radius: 6px;
+			font-size: 0.75rem;
+			color: #ccc;
+		}
+
+		.discord-activities {
+			margin-top: 16px;
+			padding-top: 16px;
+			border-top: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.activity-item {
+			margin-bottom: 10px;
+			padding: 12px;
+			background: rgba(255, 255, 255, 0.03);
+			border-radius: 6px;
+			font-size: 0.88rem;
+			line-height: 1.5;
+		}
+
+		.activity-state {
+			color: #ddd;
+			font-size: 0.88rem;
+			margin-bottom: 3px;
+		}
+
+		.activity-details {
+			color: #aaa;
+			font-size: 0.82rem;
+		}
+
+		.status-online {
+			background: #43b581;
+		}
+
+		.status-idle {
+			background: #faa61a;
+		}
+
+		.status-dnd {
+			background: #f04747;
+		}
+
+		.status-offline {
+			background: #747f8d;
+		}
+
+		.audio-controls {
+			position: fixed;
+			top: 20px;
+			left: 20px;
+			display: none;
+			z-index: 1000;
+		}
+
+		.audio-controls.show {
+			display: block;
+		}
+
+		.audio-controls::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: -130px;
+			bottom: 0;
+			pointer-events: none;
+			z-index: -1;
+		}
+
+		.audio-controls:hover::before {
+			pointer-events: all;
+		}
+
+		#mute-audio {
+			width: 35px;
+			height: 35px;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.08);
+			color: #fff;
+			border: 1px solid rgba(255, 255, 255, 0.15);
+			cursor: pointer;
+			transition: all 0.2s;
+			font-size: 13px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		#mute-audio:hover {
+			background: rgba(255, 255, 255, 0.12);
+		}
+
+		#mute-audio.muted {
+			background: rgba(255, 0, 0, 0.12);
+			border-color: rgba(255, 0, 0, 0.3);
+			color: #ff4444;
+		}
+
+		.volume-panel {
+			position: absolute;
+			top: 0;
+			left: 45px;
+			background: rgba(15, 15, 15, 0.95);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 8px;
+			padding: 10px 12px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			min-width: 120px;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.3s ease;
+		}
+
+		.audio-controls:hover .volume-panel,
+		.volume-panel:hover {
+			opacity: 1;
+			pointer-events: all;
+		}
+
+		#volume-slider {
+			flex: 1;
+			height: 3px;
+			background: rgba(255, 255, 255, 0.1);
+			border-radius: 2px;
+			outline: none;
+			cursor: pointer;
+			-webkit-appearance: none;
+		}
+
+		#volume-slider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			width: 10px;
+			height: 10px;
+			background: #fff;
+			border-radius: 50%;
+			cursor: pointer;
+		}
+
+		#volume-slider::-moz-range-thumb {
+			width: 10px;
+			height: 10px;
+			background: #fff;
+			border-radius: 50%;
+			cursor: pointer;
+			border: none;
+		}
+
+		.volume-percentage {
+			color: #888;
+			font-size: 9px;
+			min-width: 24px;
+			text-align: center;
+		}
+
+		.about-section {
+			width: 100%;
+			min-height: 100vh;
+			padding: 80px 20px;
+			background: #000;
+			opacity: 0;
+			transition: opacity 0.8s ease;
+			transition-delay: 0.3s;
+		}
+
+		.about-section.show {
+			opacity: 1;
+		}
+
+		.about-content {
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		.content-block {
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 12px;
+			padding: 30px;
+			margin-bottom: 25px;
+		}
+
+		.content-block h2 {
+			font-size: 1.5rem;
+			color: #fff;
+			margin-bottom: 15px;
+		}
+
+		.content-block p {
+			font-size: 1rem;
+			color: #aaa;
+			line-height: 1.6;
+			margin-bottom: 15px;
+		}
+
+		.content-image {
+			width: 100%;
+			border-radius: 8px;
+			margin: 20px 0;
+		}
+
+		.bio-link {
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 10px;
+			padding: 16px;
+			text-decoration: none;
+			color: #e0e0e0;
+			display: flex;
+			align-items: center;
+			gap: 13px;
+			transition: all 0.2s;
+			margin-bottom: 15px;
+		}
+
+		.bio-link:hover {
+			background: rgba(255, 255, 255, 0.08);
+			border-color: rgba(255, 255, 255, 0.2);
+			transform: translateY(-2px);
+		}
+
+		.link-icon {
+			font-size: 1.3rem;
+			color: #fff;
+			min-width: 32px;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.link-icon svg {
+			width: 22px;
+			height: 22px;
+		}
+
+		.link-content {
+			flex: 1;
+			text-align: left;
+		}
+
+		.link-title {
+			font-size: 1rem;
+			font-weight: 500;
+			margin-bottom: 2px;
+		}
+
+		.link-desc {
+			font-size: 0.78rem;
+			color: #666;
+		}
+
+		.redirect-warning {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.92);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 10000;
+		}
+
+		.redirect-warning.show {
+			display: flex;
+		}
+
+		.warning-box {
+			background: #0a0a0a;
+			border: 1px solid #222;
+			border-radius: 6px;
+			padding: 35px 30px;
+			max-width: 420px;
+			width: 90%;
+		}
+
+		.warning-title {
+			font-size: 1.3rem;
+			color: #fff;
+			margin-bottom: 18px;
+		}
+
+		.warning-text {
+			font-size: 0.9rem;
+			color: #888;
+			margin-bottom: 12px;
+		}
+
+		.warning-link {
+			color: #fff;
+			word-break: break-all;
+			background: rgba(255, 255, 255, 0.05);
+			padding: 12px;
+			border-radius: 4px;
+			margin: 18px 0;
+			font-size: 0.85rem;
+		}
+
+		.warning-timer {
+			font-size: 1.1rem;
+			color: #fff;
+			margin: 18px 0;
+			text-align: center;
+		}
+
+		.warning-buttons {
+			display: flex;
+			gap: 10px;
+			margin-top: 22px;
+		}
+
+		.warning-button {
+			flex: 1;
+			padding: 11px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 0.9rem;
+			transition: all 0.2s;
+		}
+
+		.warning-button.primary {
+			background: #fff;
+			color: #000;
+		}
+
+		.warning-button.primary:hover {
+			background: #e0e0e0;
+		}
+
+		.warning-button.secondary {
+			background: rgba(255, 255, 255, 0.08);
+			color: #fff;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+		}
+
+		.warning-button.secondary:hover {
+			background: rgba(255, 255, 255, 0.12);
+		}
+
+		@media (max-width: 768px) {
+			.username {
+				font-size: 1.5rem;
+			}
+
+			.warning-box {
+				padding: 28px 22px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="background-container"></div>
+	<div class="background-overlay"></div>
+
+	<div id="splash-screen">
+		<div class="splash-text">[ click 2 enter ]</div>
+	</div>
+
+	<div class="main-content" id="main-content">
+		<div class="username">@witheredheartz</div>
+		<p class="bio-text">owner of hellcats, and phantom hub<br>aka 99 or kyri</p>
+
+			<button class="scroll-button" id="scroll-btn">get to know me</button>
+
+			<div class="discord-card">
+				<div class="discord-banner" id="discord-banner"></div>
+				<div class="discord-card-content">
+					<div class="discord-card-header">
+						<div class="discord-avatar-wrapper">
+							<img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="discord" class="discord-avatar"
+							id="discord-avatar">
+							<div class="avatar-decoration" id="avatar-decoration" style="display: none;"></div>
+							<span class="status-dot status-offline" id="status-dot"></span>
+						</div>
+						<div class="discord-info">
+							<div class="discord-username" id="discord-username">Loading...</div>
+							<div class="discord-status-text" id="status-text">Offline</div>
+						</div>
+					</div>
+					<div class="discord-meta" id="discord-meta"></div>
+					<div class="badges-container" id="badges-container" style="display: none;"></div>
+					<div class="discord-activities" id="discord-activities"></div>
+				</div>
+			</div>
+	</div>
+
+	<div class="about-section" id="about-section">
+		<div class="about-content">
+			<h1 class="about-title">About Me</h1>
+
+			<div class="content-block">
+				<h2>Who I Am</h2>
+				<p>Your paragraph text here. Add as much as you want.</p>
+				<p>You can add multiple paragraphs like this.</p>
+			</div>
+
+			<div class="content-block">
+				<h2>My Projects</h2>
+				<p>Talk about your projects here.</p>
+
+				<img src="https://via.placeholder.com/800x400" alt="project" class="content-image">
+
+				<p>you can add text before and after images</p>
+			</div>
+
+			<div class="content-block">
+				<h2>External Link Example</h2>
+				<p>Click below to visit an external site with warning.</p>
+				<a href="https://example.com" class="bio-link" data-external="true">
+					<i class="link-icon" data-lucide="external-link"></i>
+					<div class="link-content">
+						<div class="link-title">Example Link</div>
+						<div class="link-desc">opens with warning</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="audio-controls" id="audio-controls">
+		<button id="mute-audio">
+			<i data-lucide="volume-2"></i>
+		</button>
+		<div class="volume-panel">
+			<input type="range" id="volume-slider" min="0" max="100" value="50">
+			<span class="volume-percentage" id="volume-percentage">50%</span>
+		</div>
+	</div>
+
+	<div class="redirect-warning" id="redirect-warning">
+		<div class="warning-box">
+			<div class="warning-title">leaving site</div>
+			<p class="warning-text">you are about to visit:</p>
+			<div class="warning-link" id="warning-url"></div>
+			<div class="warning-timer">redirecting in <span id="countdown">10</span> seconds</div>
+			<div class="warning-buttons">
+				<button class="warning-button primary" id="open-now">open now</button>
+				<button class="warning-button secondary" id="cancel-redirect">cancel</button>
+			</div>
+		</div>
+	</div>
+
+	<audio id="bg-audio" loop preload="none">
+		<source
+			src="https://github.com/Justanewplayer19/rizzyv2/raw/refs/heads/main/Lil%20Tecca%20-%20Dark%20Thoughts%20(Official%20Video)%20-%20Lil%20Tecca.mp3"
+			type="audio/mpeg">
+	</audio>
+
+	<script>
+		const audio = document.getElementById('bg-audio');
+		const splash = document.getElementById('splash-screen');
+		const mainContent = document.getElementById('main-content');
+		const audioControls = document.getElementById('audio-controls');
+		const muteBtn = document.getElementById('mute-audio');
+		const volumeSlider = document.getElementById('volume-slider');
+		const volumePercentage = document.getElementById('volume-percentage');
+		const scrollBtn = document.getElementById('scroll-btn');
+		const aboutSection = document.getElementById('about-section');
+		const redirectWarning = document.getElementById('redirect-warning');
+		const warningUrl = document.getElementById('warning-url');
+		const countdown = document.getElementById('countdown');
+		const openNow = document.getElementById('open-now');
+		const cancelRedirect = document.getElementById('cancel-redirect');
+
+		let isMuted = false;
+		let redirectTimer;
+		let targetUrl = '';
+
+		if (audio) {
+			audio.volume = 0.5;
+		}
+
+		function updateMute() {
+			const iconContainer = muteBtn.querySelector('i');
+			if (!iconContainer) return;
+
+			if (isMuted) {
+				iconContainer.setAttribute('data-lucide', 'volume-x');
+				muteBtn.classList.add('muted');
+			} else {
+				iconContainer.setAttribute('data-lucide', 'volume-2');
+				muteBtn.classList.remove('muted');
+			}
+
+			iconContainer.innerHTML = '';
+			lucide.createIcons();
+		}
+
+		function showRedirectWarning(url) {
+			targetUrl = url;
+			warningUrl.textContent = url;
+			redirectWarning.classList.add('show');
+
+			let timeLeft = 10;
+			countdown.textContent = timeLeft;
+
+			redirectTimer = setInterval(() => {
+				timeLeft--;
+				countdown.textContent = timeLeft;
+
+				if (timeLeft <= 0) {
+					clearInterval(redirectTimer);
+					window.open(url, '_blank');
+					redirectWarning.classList.remove('show');
+				}
+			}, 1000);
+		}
+
+		splash.addEventListener('click', () => {
+			splash.classList.add('hide');
+			document.body.style.overflow = 'auto';
+			lucide.createIcons();
+
+			if (audio) {
+				audio.play().catch(e => console.log(e));
+				audioControls.classList.add('show');
+			}
+
+			setTimeout(() => {
+				mainContent.classList.add('show');
+				aboutSection.classList.add('show');
+				updateDiscordStatus();
+			}, 300);
+		});
+
+		scrollBtn.addEventListener('click', () => {
+			aboutSection.scrollIntoView({ behavior: 'smooth' });
+		});
+
+		muteBtn.addEventListener('click', () => {
+			isMuted = !isMuted;
+			if (audio) {
+				audio.muted = isMuted;
+			}
+			updateMute();
+		});
+
+		volumeSlider.addEventListener('input', () => {
+			const vol = volumeSlider.value;
+			if (audio) {
+				audio.volume = vol / 100;
+			}
+			volumePercentage.textContent = vol + '%';
+
+			if (isMuted && vol > 0) {
+				isMuted = false;
+				if (audio) {
+					audio.muted = false;
+				}
+				updateMute();
+			}
+		});
+
+		document.addEventListener('click', (e) => {
+			const link = e.target.closest('a[data-external="true"]');
+			if (link) {
+				e.preventDefault();
+				const url = link.getAttribute('href');
+				showRedirectWarning(url);
+			}
+		});
+
+		openNow.addEventListener('click', () => {
+			clearInterval(redirectTimer);
+			window.open(targetUrl, '_blank');
+			redirectWarning.classList.remove('show');
+		});
+
+		cancelRedirect.addEventListener('click', () => {
+			clearInterval(redirectTimer);
+			redirectWarning.classList.remove('show');
+		});
+
+		async function updateDiscordStatus() {
+			try {
+				const statusDot = document.getElementById('status-dot');
+				const statusText = document.getElementById('status-text');
+				const avatar = document.getElementById('discord-avatar');
+				const username = document.getElementById('discord-username');
+				const activitiesContainer = document.getElementById('discord-activities');
+				const metaContainer = document.getElementById('discord-meta');
+				const bannerEl = document.getElementById('discord-banner');
+				const decorationEl = document.getElementById('avatar-decoration');
+				const badgesEl = document.getElementById('badges-container');
+
+				if (!username || !avatar) {
+					return;
+				}
+
+				const res = await fetch('https://discord-lookup-api-opal-three.vercel.app/v1/user/1023772274446323713');
+				const data = await res.json();
+
+				let usernameText = data.global_name || data.username || 'Discord User';
+				let clanTag = '';
+
+				if (data.raw?.clan?.tag) {
+					const badgeUrl = `https://cdn.discordapp.com/clan-badges/${data.raw.clan.identity_guild_id}/${data.raw.clan.badge}.png`;
+					clanTag = `<span class="clan-tag"><img src="${badgeUrl}" class="clan-icon" alt="${data.raw.clan.tag}"> ${data.raw.clan.tag}</span>`;
+				}
+
+				username.innerHTML = usernameText + clanTag;
+
+				if (data.avatar?.link) {
+					avatar.src = data.avatar.link;
+				}
+
+				if (bannerEl) {
+					if (data.banner?.link) {
+						bannerEl.style.backgroundImage = `url('${data.banner.link}')`;
+					} else if (data.banner?.color) {
+						bannerEl.style.backgroundColor = data.banner.color;
+					}
+				}
+
+				if (decorationEl && data.avatar_decoration?.asset) {
+					const decorUrl = `https://cdn.discordapp.com/avatar-decoration-presets/${data.avatar_decoration.asset}.png`;
+					decorationEl.style.backgroundImage = `url('${decorUrl}')`;
+					decorationEl.style.display = 'block';
+				}
+
+				if (metaContainer) {
+					metaContainer.innerHTML = '';
+				}
+
+				if (badgesEl) {
+					badgesEl.innerHTML = '';
+					if (data.badges && data.badges.length > 0) {
+						const badgeNames = {
+							'HOUSE_BRAVERY': 'HypeSquad Bravery',
+							'HOUSE_BRILLIANCE': 'HypeSquad Brilliance',
+							'HOUSE_BALANCE': 'HypeSquad Balance',
+							'ACTIVE_DEVELOPER': 'Active Developer',
+							'EARLY_SUPPORTER': 'Early Supporter'
+						};
+
+						data.badges.forEach(badge => {
+							const badgeEl = document.createElement('div');
+							badgeEl.className = 'badge-item';
+							badgeEl.textContent = badgeNames[badge] || badge;
+							badgesEl.appendChild(badgeEl);
+						});
+						badgesEl.style.display = 'flex';
+					}
+				}
+
+				const lanyardRes = await fetch('https://api.lanyard.rest/v1/users/1023772274446323713');
+				const lanyardData = await lanyardRes.json();
+
+				if (lanyardData.success && lanyardData.data) {
+					const user = lanyardData.data;
+
+					const statusMap = {
+						'online': 'status-online',
+						'idle': 'status-idle',
+						'dnd': 'status-dnd',
+						'offline': 'status-offline'
+					};
+
+					const statusTextMap = {
+						'online': 'Online',
+						'idle': 'Idle',
+						'dnd': 'Do Not Disturb',
+						'offline': 'Offline'
+					};
+
+					const status = user.discord_status || 'offline';
+					if (statusDot) {
+						statusDot.className = 'status-dot ' + statusMap[status];
+					}
+					if (statusText) {
+						statusText.textContent = statusTextMap[status];
+					}
+
+					if (activitiesContainer && user.activities && user.activities.length > 0) {
+						activitiesContainer.innerHTML = '';
+						user.activities.slice(0, 3).forEach(activity => {
+							const activityEl = document.createElement('div');
+							activityEl.className = 'activity-item';
+
+							let activityHTML = '';
+
+							if (activity.state) {
+								activityHTML += `<div class="activity-state">${activity.state}</div>`;
+							}
+
+							if (activity.details) {
+								activityHTML += `<div class="activity-details">${activity.details}</div>`;
+							}
+
+							activityEl.innerHTML = activityHTML;
+							activitiesContainer.appendChild(activityEl);
+						});
+					} else if (activitiesContainer) {
+						activitiesContainer.innerHTML = '';
+					}
+				}
+			} catch (e) {
+				console.log('failed to load discord', e);
+			}
+		}
+
+		setInterval(updateDiscordStatus, 30000);
+
+		let ti = 0;
+		let del = false;
+		const base = "witheredheartz";
+
+		function doTitle() {
+			document.title = base.substring(0, ti) || 'Welcome';
+
+			if (!del && ti < base.length) {
+				ti++;
+				setTimeout(doTitle, 400);
+			} else if (!del) {
+				del = true;
+				setTimeout(doTitle, 2000);
+			} else if (ti > 0) {
+				ti--;
+				setTimeout(doTitle, 400);
+			} else {
+				del = false;
+				setTimeout(doTitle, 1000);
+			}
+		}
+
+		doTitle();
+		lucide.createIcons();
+	</script>
+</body>
+
+</html>
