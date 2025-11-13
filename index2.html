@@ -1,8 +1,4 @@
-<!--      _ _   _                       _ _                     _       
-__      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
-\ \ /\ / / | __| '_ \ / _ \ '__/ _ \/ _` | '_ \ / _ \/ _` | '__| __|_  /
- \ V  V /| | |_| | | |  __/ | |  __/ (_| | | | |  __/ (_| | |  | |_ / / 
-  \_/\_/ |_|\__|_| |_|\___|_|  \___|\__,_|_| |_|\___|\__,_|_|   \__/___| -->
+<!-- Witheredheartz made this, do not delete this, this is credits, even if you obfuscate it put my name it in the comment thanks. -->
 <!-- you must join discord.gg/lanyard for user tracking and go to support and do /who and type your username. -->
 <!DOCTYPE html>
 <html lang="en">
@@ -34,6 +30,10 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 		const SONG_TITLE = 'YOUR_SONG_TITLE';
 		const SONG_ARTIST = 'YOUR_ARTIST_NAME';
 		const DISCORD_USER_ID = 'YOUR_DISCORD_ID_HERE';
+		
+		const USE_STARS = true;
+		const CUSTOM_BACKGROUND = 'YOUR_BACKGROUND_URL_HERE';
+		const BACKGROUND_MUTED = true;
 	</script>
 	<style>
 		html,
@@ -41,7 +41,6 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 			margin: 0;
 			padding: 0;
 			font-family: 'VT323', monospace;
-			cursor: none;
 		}
 
 		#enter-screen {
@@ -124,29 +123,15 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 			}
 		}
 
-		.cursor-follower {
+		.custom-background {
 			position: fixed;
-			width: 30px;
-			height: 30px;
-			border-radius: 50%;
-			background: radial-gradient(circle, rgba(242, 162, 194, 0.4), transparent);
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
 			pointer-events: none;
-			z-index: 9999;
-			display: none;
-		}
-
-		@media (min-width: 768px) {
-			.cursor-follower {
-				display: block;
-			}
-		}
-
-		@media (max-width: 767px) {
-
-			html,
-			body {
-				cursor: auto;
-			}
+			z-index: 0;
 		}
 
 		.link-item {
@@ -184,7 +169,6 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 			height: 14px;
 			background: #f2a2c2;
 			border-radius: 50%;
-			cursor: none;
 		}
 
 		.custom-slider::-moz-range-thumb {
@@ -192,35 +176,7 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 			height: 14px;
 			background: #f2a2c2;
 			border-radius: 50%;
-			cursor: none;
 			border: none;
-		}
-
-		button,
-		a,
-		input,
-		select,
-		textarea {
-			cursor: none;
-		}
-
-		@media (max-width: 767px) {
-
-			button,
-			a,
-			input,
-			select,
-			textarea {
-				cursor: auto;
-			}
-
-			.custom-slider::-webkit-slider-thumb {
-				cursor: pointer;
-			}
-
-			.custom-slider::-moz-range-thumb {
-				cursor: pointer;
-			}
 		}
 
 		.waveform {
@@ -442,7 +398,7 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 
 	<div class="main-content">
 		<div class="stars" id="stars"></div>
-		<div class="cursor-follower" id="cursor"></div>
+		<div id="customBgContainer"></div>
 
 		<audio id="bgAudio" loop></audio>
 
@@ -507,20 +463,10 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 					<span id="duration">0:00</span>
 				</div>
 
-				<div class="flex justify-center items-center gap-6">
-					<button class="text-neutral-400 hover:text-neutral-200 transition-colors" id="prevBtn">
-						<svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-							<path d="M6 6h2v12H6V6zm3.5 6l8.5 6V6l-8.5 6z"></path>
-						</svg>
-					</button>
+				<div class="flex justify-center items-center">
 					<button class="w-12 h-12 flex items-center justify-center rounded-full hover:opacity-90 transition-opacity" style="background-color: #f2a2c2;" id="playBtn">
 						<svg viewBox="0 0 24 24" fill="white" class="w-7 h-7">
 							<path d="M8 5v14l11-7z"></path>
-						</svg>
-					</button>
-					<button class="text-neutral-400 hover:text-neutral-200 transition-colors" id="nextBtn">
-						<svg viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-							<path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"></path>
 						</svg>
 					</button>
 				</div>
@@ -531,7 +477,7 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 							d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z">
 						</path>
 					</svg>
-					<input type="range" min="0" max="100" value="75" class="custom-slider" id="volume">
+					<input type="range" min="0" max="100" value="50" class="custom-slider" id="volume">
 				</div>
 			</div>
 
@@ -593,33 +539,35 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 			}, 800);
 		});
 
-		for (let i = 0; i < 100; i++) {
-			const star = document.createElement('div');
-			star.className = 'star';
-			star.style.left = Math.random() * 100 + '%';
-			star.style.top = Math.random() * 100 + '%';
-			star.style.animationDelay = Math.random() * 3 + 's';
-			document.getElementById('stars').appendChild(star);
+		if (USE_STARS) {
+			for (let i = 0; i < 100; i++) {
+				const star = document.createElement('div');
+				star.className = 'star';
+				star.style.left = Math.random() * 100 + '%';
+				star.style.top = Math.random() * 100 + '%';
+				star.style.animationDelay = Math.random() * 3 + 's';
+				document.getElementById('stars').appendChild(star);
+			}
+		} else {
+			const container = document.getElementById('customBgContainer');
+			const fileExt = CUSTOM_BACKGROUND.split('.').pop().toLowerCase();
+			
+			if (fileExt === 'mp4' || fileExt === 'webm' || fileExt === 'ogg') {
+				const video = document.createElement('video');
+				video.className = 'custom-background';
+				video.autoplay = true;
+				video.loop = true;
+				video.muted = BACKGROUND_MUTED;
+				video.playsInline = true;
+				video.src = CUSTOM_BACKGROUND;
+				container.appendChild(video);
+			} else {
+				const img = document.createElement('img');
+				img.className = 'custom-background';
+				img.src = CUSTOM_BACKGROUND;
+				container.appendChild(img);
+			}
 		}
-
-		const cursor = document.getElementById('cursor');
-		let mouseX = 0;
-		let mouseY = 0;
-		let cursorX = 0;
-		let cursorY = 0;
-
-		document.addEventListener('mousemove', function(e) {
-			mouseX = e.clientX;
-			mouseY = e.clientY;
-		});
-
-		function animate() {
-			cursorX += (mouseX - cursorX) * 0.1;
-			cursorY += (mouseY - cursorY) * 0.1;
-			cursor.style.transform = 'translate(' + (cursorX - 15) + 'px, ' + (cursorY - 15) + 'px)';
-			requestAnimationFrame(animate);
-		}
-		animate();
 
 		const playBtn = document.getElementById('playBtn');
 		const waveform = document.getElementById('waveform');
@@ -632,7 +580,7 @@ __      _(_) |_| |__   ___ _ __ ___  __| | |__   ___  __ _ _ __| |_ ____
 		let isPlaying = false;
 
 		audio.src = SONG_URL;
-		audio.volume = 0.75;
+		audio.volume = 0.5;
 		songTitle.textContent = SONG_TITLE;
 		songArtist.textContent = SONG_ARTIST;
 
